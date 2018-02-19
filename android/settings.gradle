@@ -1,0 +1,3 @@
+rootProject.name = 'Pougher_Ian_Assignment4_Android'
+
+include ':app'

@@ -58,6 +58,7 @@ export default class App extends Component<{}> {
       </TouchableWithoutFeedback>
     );
   }
+
   checkUsability(focus)
   {
     return (!isNaN(parseFloat(focus))&& isFinite(focus));
@@ -155,8 +156,8 @@ export default class App extends Component<{}> {
       before: original,
       value: equationProduct
     }
-    this.equation_history.push(original, key={keyvalue});
-    this.equation_results.push(equationProduct, key={keyvalue});
+    this.equation_history.push(<Text>{original}</Text>, key={keyvalue});
+    this.equation_results.push(<Text>{equationProduct}</Text>, key={keyvalue});
   }
 
 }   

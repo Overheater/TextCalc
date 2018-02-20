@@ -12,7 +12,7 @@ export default class Calcbutton extends Component {
         return (
             
                 <TouchableOpacity
-                   // onPress={() => this.props.Calculate()}
+                   onPress={() => this.props.Calculate()}
                     style={Styles.CalculateStyling}>
                     <Text style={Styles.equalsign}>=</Text>
                 </TouchableOpacity>

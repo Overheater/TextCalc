@@ -29,10 +29,11 @@ const instructions = Platform.select({
 
 
 export default class App extends Component<{}> {
+  
   constructor(props)
   {
     super(props);
-    this.state = { text: 'input your equation here'};
+    this.state = { text: ''};
      this.equation_history = ([]);
      this.equation_results=([]);
      this.equationnumb=0;
@@ -44,7 +45,7 @@ export default class App extends Component<{}> {
 
       <View style={Styles.container}>
           <Text>Text Calculator</Text>
-          <View style={{flex:6,backgroundColor:'blue'}}>
+          <View style={Styles.flatliststyle}>
           <FlatList
           data={this.equation_results}
           renderItem={(this._renderItem)}
@@ -59,7 +60,8 @@ export default class App extends Component<{}> {
             <View style={Styles.calcContainer}>
             <TextInput
           style={{width: 200,height: 55, borderBottomColor: Platform.OS === 'ios' ? 'black' : null, borderBottomWidth: Platform.OS === 'ios' ? 1 : null}}
-          placeholder='input your equation here'
+          placeholder='Input your equation here'
+          value={this.state.text}
           onChangeText={(intext) => this.setState({text:intext})}
           onSubmitEditing={()=>this.syCalculate()}
           
@@ -72,31 +74,90 @@ export default class App extends Component<{}> {
       
     );
   }
+    //all credit for this remove funcction is given to John Resig, creator of jquery
+
   _renderItem = ({item}) => {
     return (
+      <TouchableWithoutFeedback onPress={()=>this.infoAlert(item.number)}>
       <View style={Styles.itemContainer}>
-        <Text style={Styles.textItem}>{item.number}                            {item.value}</Text>
+        <Text style={Styles.textItem}>{item.number}                                       {item.value}</Text>
       </View>
+      </TouchableWithoutFeedback>
     );
   }
+
+  infoAlert(number) {
+    Alert.alert(
+      "equation",
+      String(this.equation_history[number-1].equation),
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ],
+      { cancelable: false }
+    );
+  }
+
 
   checkUsability(focus)
   {
     return (!isNaN(parseFloat(focus))&& isFinite(focus));
   }
+
   syCalculate()
   {
     if(this.state.text==='clear'){
       this.equation_results=[];
+      this.equation_history=[];
+      this.equationnumb=0;
+      this.setState({text:''})
+      return;
+    }
+    if(this.state.text==='remove'&& this.equation_history.length>0){
+      this.equation_results.splice(this.equation_results.length-1,1);
+      this.equation_history.splice(this.equation_history.length-1,1);
+      this.equationnumb=this.equationnumb-1;
+      this.setState({text:''})
+      return;
+    }
+    if(this.state.text==='remove'&& this.equation_history.length<=0){
+      this.setState({text:''})
+      return;
+    }
+    if(this.state.text==='undo'&& this.equation_history.length>0){
+      var equation=this.equation_history[this.equation_history.length];
+      this.setState({text:String(this.equation_history[this.equationnumb-1].equation)});
+      this.equation_results.splice(this.equation_results.length-1,1);
+      this.equation_history.splice(this.equation_history.length-1,1);
+      this.equationnumb=this.equationnumb-1;
+      return;
+    }
+    if(this.state.text==='about'){
+      this.launchAlert("about","this app is made by Ian Pougher")
+      this.setState({text:''})
+      return;
+    }
+    if(this.state.text==='help'){
+      this.launchAlert("help","use this app by entering an equation, or use the clear, remove, undo or about commands to explore")
+      this.setState({text:''})
       return;
     }
     this.equationnumb=this.equationnumb+1;
     keyvalue=this.equationnumb;
     var original=this.state.text;
-    this.equation_history.push(<Text>{original}</Text>);
+    this.equation_history.push({equation:original});
     //convert number to string
     this.equation_results.push({value:(eval(original)),number:keyvalue});    
-    this.setState({text:""})
+    this.setState({text:''})
+  }
+  launchAlert(title,val) {
+    Alert.alert(
+      title,
+      val,
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ],
+      { cancelable: false }
+    );
   }
   //uses a shunting yard algorithm, based on https://www.thepolyglotdeveloper.com/2015/03/parse-with-the-shunting-yard-algorithm-using-javascript/
   //This version is commented out because I can't get my associativity variable of my operator objects to be recognized

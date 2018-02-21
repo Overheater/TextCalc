@@ -4,7 +4,7 @@ export default StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#F5FCFF',
+      backgroundColor: '#FAEED4',
     },
     welcome: {
       fontSize: 20,
@@ -25,9 +25,15 @@ export default StyleSheet.create({
         borderBottomWidth: 2,
         borderBottomColor: "#47315a",
     },
+    flatliststyle:{
+      flex:6,
+      backgroundColor:'#B5B5B5',
+      alignItems:'center',
+      width:200
+    },
     scrollContent: {
       alignItems:'center',
-
+      fontSize:16,
     },
     CalculateStyling:{
         borderRadius: 3,
@@ -52,10 +58,16 @@ export default StyleSheet.create({
       flexDirection: 'row',
       justifyContent : 'space-around',
       alignSelf: 'stretch',
-      width:200
+      alignItems:'center',
+      borderBottomWidth:1,
+      borderBottomColor:'black',
+      width:200,
+      height:45,
+      
     },
     textItem: {
       flex:1,
-      textAlign: 'left'
+      textAlign: 'left',
+      fontSize:17,
     }
   });

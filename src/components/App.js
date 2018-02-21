@@ -14,7 +14,9 @@ import {
   ScrollView,
   Keyboard,
   TextInput,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  FlatList
 } from 'react-native';
 import Styles from '../Styles/Styles'
 import CalcButton from './calculatebutton'
@@ -34,28 +36,47 @@ export default class App extends Component<{}> {
      this.equation_history = ([]);
      this.equation_results=([]);
      this.equationnumb=0;
+
   }
   render() {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+
       <View style={Styles.container}>
-            <Text>Text Calculator</Text>
-            <ScrollView 
-                style={Styles.scroll} 
-                contentContainerStyle={Styles.scrollContent}
-            >
-            </ScrollView>
+          <Text>Text Calculator</Text>
+          <View style={{flex:6,backgroundColor:'blue'}}>
+          <FlatList
+          data={this.equation_results}
+          renderItem={(this._renderItem)}
+          style={{alignSelf: 'stretch', width:400}}
+          keyExtractor={(item, index) => item.number}
+          shouldComponentUpdate={()=>{return true}}
+          onScroll={()=>Keyboard.dismiss()}
+        >
+        </FlatList>
+        </View>
+            
             <View style={Styles.calcContainer}>
             <TextInput
           style={{width: 200,height: 55, borderBottomColor: Platform.OS === 'ios' ? 'black' : null, borderBottomWidth: Platform.OS === 'ios' ? 1 : null}}
           placeholder='input your equation here'
-          onChangeText={(text) => this.setState({text})}
-          onSubmitEditing={this.syCalculate(this.state.text)}
+          onChangeText={(intext) => this.setState({text:intext})}
+          onSubmitEditing={()=>this.syCalculate()}
+          
         />
-
         </View>
+       
       </View>
+
       </TouchableWithoutFeedback>
+      
+    );
+  }
+  _renderItem = ({item}) => {
+    return (
+      <View style={Styles.itemContainer}>
+        <Text style={Styles.textItem}>{item.number}                            {item.value}</Text>
+      </View>
     );
   }
 
@@ -63,13 +84,34 @@ export default class App extends Component<{}> {
   {
     return (!isNaN(parseFloat(focus))&& isFinite(focus));
   }
-  
+  syCalculate()
+  {
+    if(this.state.text==='clear'){
+      this.equation_results=[];
+      return;
+    }
+    this.equationnumb=this.equationnumb+1;
+    keyvalue=this.equationnumb;
+    var original=this.state.text;
+    this.equation_history.push(<Text>{original}</Text>);
+    //convert number to string
+    this.equation_results.push({value:(eval(original)),number:keyvalue});    
+    this.setState({text:""})
+  }
   //uses a shunting yard algorithm, based on https://www.thepolyglotdeveloper.com/2015/03/parse-with-the-shunting-yard-algorithm-using-javascript/
-  syCalculate(expression)
+  //This version is commented out because I can't get my associativity variable of my operator objects to be recognized
+  /*syCalculate()
   {
     this.equationnumb+1;
     keyvalue=this.equationnumb;
-    var original=expression;
+    var original=this.state.text;
+    if(this.state.text==='clear'){
+      this.equation_history=[];
+      this.equation_results=[];
+      this.equationnumb=0;
+      return;
+    }
+
     //our finished product at the end of the parsing function
     var equationProduct="";
     var operatorstack=[];
@@ -78,44 +120,44 @@ export default class App extends Component<{}> {
       '^':{
         //highest precendence other than parenthesis, therefore its 4
         precedence: 4,
-        associativity: 'right'
+        associativity: 'Right'
       },
       '/':{
         //third highest precedence, therefore its 3
         precendence: 3,
-        associativity: 'left'
+        associativity: 'Left'
 
       },
       '*':{
                 //third highest precedence along with division, therefore its 3
         precedence:3,
-        associativity: 'left'
+        associativity: 'Left'
       },
       '-':{
         //fourth highest precedence along with subtraction, therefore its 2
         precedence:2,
-        associativity: 'left'
+        associativity: 'Left'
       },
       '+':{
         //fourth highest precedence along with subtraction, therefore its 2
         precendence: 2,
-        associativity: 'left'
+        associativity: 'Left'
       },
 
     };
-    //cleans up the expression array/string for further use
-    expression=expression.replace("/\s+/g", "");
+    //cleans up the expression array of any spaces for further use
+    this.state.text = this.state.text.replace(/\s+/g, "");
     //splits up the expression array when an operator or parenthises  is found
-    expression=expression.split("/([\+\-\*\/\^\(\)])/");
+    this.state.text=this.state.text.split(/([\+\-\*\/\^\(\)])/);
     // cleans up the expression, adding 1's 
-    for(let i=0;i<expression.length;i++)
+    for(let i=0;i<this.state.text.length;i++)
     {
       if(this[i]===''){
-        expression.splice(i,1);
+        this.state.text.splice(i,1);
       }
     }
-    for(let i=0;i<expression.length;i++){
-    var focus=expression[i];
+    for(let i=0;i<this.state.text.length;i++){
+    var focus=this.state.text[i];
     //checks if the character in question is numeric
     //check here if it doesn't return correctly
     if(this.checkUsability(focus)){
@@ -128,7 +170,7 @@ export default class App extends Component<{}> {
       var currentoperator= focus;
       var stackposition=operatorstack[operatorstack.length-1];
       // gets the operator stack sorted correctly based on precedence
-      while("^*/+-".indexOf(stackposition) !== -1 && ((operators[currentoperator].associativity === "Left" && operators[currentoperator].precedence <= operators[stackposition].precedence) || (operators[o1].associativity === "Right" && operators[currentoperator].precedence < operators[stackposition].precedence)))
+      while("^/*+-".indexOf(stackposition) !== -1 && ((operatorsystem.currentoperator.associativity === 'Left' && operatorsystem.currentoperator.precedence <= operatorsystem.stackposition.precedence) || (operatorsystem.currentoperator.associativity === Right' && operatorsystem.currentoperator.precedence < operatorsystem.tackposition.precedence)))
       {
         equationProduct += operatorstack.pop + ' ';
         stackposition=operatorstack[operatorstack.length-1];
@@ -152,14 +194,11 @@ export default class App extends Component<{}> {
     while(operatorstack.length>0){
       equationProduct+=operatorstack.pop()+' ';
     }
-    var equation={
-      before: original,
-      value: equationProduct
-    }
-    this.equation_history.push(<Text>{original}</Text>, key={keyvalue});
-    this.equation_results.push(<Text>{equationProduct}</Text>, key={keyvalue});
-  }
 
+    this.equation_history.push(<Text>{original}</Text>);
+    this.equation_results.push(<Text>{equationProduct}</Text>);
+  }
+*/
 }   
 
 

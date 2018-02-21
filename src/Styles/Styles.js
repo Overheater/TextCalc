@@ -17,7 +17,9 @@ export default StyleSheet.create({
       marginBottom: 5,
     },
     scroll: {
-      alignSelf: 'stretch'
+      alignSelf: 'stretch',
+      height:500,
+      width:400,
     },
     scrollBorder:{
         borderBottomWidth: 2,
@@ -45,5 +47,15 @@ export default StyleSheet.create({
         height:50, 
         flexDirection:'row',
         alignItems:'center'
+    },
+    itemContainer: {
+      flexDirection: 'row',
+      justifyContent : 'space-around',
+      alignSelf: 'stretch',
+      width:200
+    },
+    textItem: {
+      flex:1,
+      textAlign: 'left'
     }
   });
